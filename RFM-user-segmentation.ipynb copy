@@ -1,0 +1,1411 @@
+{
+ "cells": [
+  {
+   "cell_type": "raw",
+   "metadata": {},
+   "source": [
+    "<add text info>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import datetime as dt\n",
+    "import numpy as np\n",
+    "\n",
+    "import warnings\n",
+    "warnings.filterwarnings('ignore')\n",
+    "pd.options.display.float_format = '{:,.2f}'.format\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Get Data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Invoice</th>\n",
+       "      <th>StockCode</th>\n",
+       "      <th>Description</th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>InvoiceDate</th>\n",
+       "      <th>Price</th>\n",
+       "      <th>Customer ID</th>\n",
+       "      <th>Country</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>489434</td>\n",
+       "      <td>85048</td>\n",
+       "      <td>15CM CHRISTMAS GLASS BALL 20 LIGHTS</td>\n",
+       "      <td>12</td>\n",
+       "      <td>2009-12-01 07:45:00</td>\n",
+       "      <td>6.95</td>\n",
+       "      <td>13085.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>489434</td>\n",
+       "      <td>79323P</td>\n",
+       "      <td>PINK CHERRY LIGHTS</td>\n",
+       "      <td>12</td>\n",
+       "      <td>2009-12-01 07:45:00</td>\n",
+       "      <td>6.75</td>\n",
+       "      <td>13085.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>489434</td>\n",
+       "      <td>79323W</td>\n",
+       "      <td>WHITE CHERRY LIGHTS</td>\n",
+       "      <td>12</td>\n",
+       "      <td>2009-12-01 07:45:00</td>\n",
+       "      <td>6.75</td>\n",
+       "      <td>13085.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>489434</td>\n",
+       "      <td>22041</td>\n",
+       "      <td>RECORD FRAME 7\" SINGLE SIZE</td>\n",
+       "      <td>48</td>\n",
+       "      <td>2009-12-01 07:45:00</td>\n",
+       "      <td>2.10</td>\n",
+       "      <td>13085.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>489434</td>\n",
+       "      <td>21232</td>\n",
+       "      <td>STRAWBERRY CERAMIC TRINKET BOX</td>\n",
+       "      <td>24</td>\n",
+       "      <td>2009-12-01 07:45:00</td>\n",
+       "      <td>1.25</td>\n",
+       "      <td>13085.0</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "  Invoice StockCode                          Description  Quantity  \\\n",
+       "0  489434     85048  15CM CHRISTMAS GLASS BALL 20 LIGHTS        12   \n",
+       "1  489434    79323P                   PINK CHERRY LIGHTS        12   \n",
+       "2  489434    79323W                  WHITE CHERRY LIGHTS        12   \n",
+       "3  489434     22041         RECORD FRAME 7\" SINGLE SIZE         48   \n",
+       "4  489434     21232       STRAWBERRY CERAMIC TRINKET BOX        24   \n",
+       "\n",
+       "          InvoiceDate  Price  Customer ID         Country  \n",
+       "0 2009-12-01 07:45:00   6.95      13085.0  United Kingdom  \n",
+       "1 2009-12-01 07:45:00   6.75      13085.0  United Kingdom  \n",
+       "2 2009-12-01 07:45:00   6.75      13085.0  United Kingdom  \n",
+       "3 2009-12-01 07:45:00   2.10      13085.0  United Kingdom  \n",
+       "4 2009-12-01 07:45:00   1.25      13085.0  United Kingdom  "
+      ]
+     },
+     "execution_count": 2,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df= pd.read_excel('https://archive.ics.uci.edu/ml/machine-learning-databases/00502/online_retail_II.xlsx')\n",
+    "df_backup = df.copy()\n",
+    "df.head(5)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Dataset Exploration"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Available data and time period"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 90,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "(525461, 8)\n",
+      "maximum available date: 2010-12-09 20:01:00\n",
+      "minimum available date: 2009-12-01 07:45:00\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(df.shape)\n",
+    "print(f\"maximum available date: {max(df['InvoiceDate'])}\")\n",
+    "print(f\"minimum available date: {min(df['InvoiceDate'])}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Data types and missing data"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 84,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "RangeIndex: 525461 entries, 0 to 525460\n",
+      "Data columns (total 8 columns):\n",
+      " #   Column       Non-Null Count   Dtype         \n",
+      "---  ------       --------------   -----         \n",
+      " 0   Invoice      525461 non-null  object        \n",
+      " 1   StockCode    525461 non-null  object        \n",
+      " 2   Description  522533 non-null  object        \n",
+      " 3   Quantity     525461 non-null  int64         \n",
+      " 4   InvoiceDate  525461 non-null  datetime64[ns]\n",
+      " 5   Price        525461 non-null  float64       \n",
+      " 6   Customer ID  417534 non-null  float64       \n",
+      " 7   Country      525461 non-null  object        \n",
+      "dtypes: datetime64[ns](1), float64(2), int64(1), object(4)\n",
+      "memory usage: 32.1+ MB\n"
+     ]
+    }
+   ],
+   "source": [
+    "df.info()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### missing data proportions:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 85,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "     Variables  missing_count  missing_perc\n",
+      "0      Invoice              0          0.00\n",
+      "1    StockCode              0          0.00\n",
+      "2  Description           2928          0.01\n",
+      "3     Quantity              0          0.00\n",
+      "4  InvoiceDate              0          0.00\n",
+      "5        Price              0          0.00\n",
+      "6  Customer ID         107927          0.21\n",
+      "7      Country              0          0.00\n"
+     ]
+    }
+   ],
+   "source": [
+    "na_key_columns = df.isnull().sum().reset_index()\n",
+    "na_key_columns.columns=['Variables','missing_count']\n",
+    "#missing_data['Missing_perc']\n",
+    "na_key_columns['missing_perc']=na_key_columns.missing_count/df.shape[0]\n",
+    "print(na_key_columns)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "* Observation: Many rows with empty `Customer ID` and some with empty `Description`"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "    * Exploring rows with missing customer id's:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 86,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Invoice</th>\n",
+       "      <th>StockCode</th>\n",
+       "      <th>Description</th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>InvoiceDate</th>\n",
+       "      <th>Price</th>\n",
+       "      <th>Customer ID</th>\n",
+       "      <th>Country</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>263</th>\n",
+       "      <td>489464</td>\n",
+       "      <td>21733</td>\n",
+       "      <td>85123a mixed</td>\n",
+       "      <td>-96</td>\n",
+       "      <td>2009-12-01 10:52:00</td>\n",
+       "      <td>0.00</td>\n",
+       "      <td>nan</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>283</th>\n",
+       "      <td>489463</td>\n",
+       "      <td>71477</td>\n",
+       "      <td>short</td>\n",
+       "      <td>-240</td>\n",
+       "      <td>2009-12-01 10:52:00</td>\n",
+       "      <td>0.00</td>\n",
+       "      <td>nan</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>284</th>\n",
+       "      <td>489467</td>\n",
+       "      <td>85123A</td>\n",
+       "      <td>21733 mixed</td>\n",
+       "      <td>-192</td>\n",
+       "      <td>2009-12-01 10:53:00</td>\n",
+       "      <td>0.00</td>\n",
+       "      <td>nan</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>470</th>\n",
+       "      <td>489521</td>\n",
+       "      <td>21646</td>\n",
+       "      <td>NaN</td>\n",
+       "      <td>-50</td>\n",
+       "      <td>2009-12-01 11:44:00</td>\n",
+       "      <td>0.00</td>\n",
+       "      <td>nan</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>577</th>\n",
+       "      <td>489525</td>\n",
+       "      <td>85226C</td>\n",
+       "      <td>BLUE PULL BACK RACING CAR</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2009-12-01 11:49:00</td>\n",
+       "      <td>0.55</td>\n",
+       "      <td>nan</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    Invoice StockCode                Description  Quantity  \\\n",
+       "263  489464     21733               85123a mixed       -96   \n",
+       "283  489463     71477                      short      -240   \n",
+       "284  489467    85123A                21733 mixed      -192   \n",
+       "470  489521     21646                        NaN       -50   \n",
+       "577  489525    85226C  BLUE PULL BACK RACING CAR         1   \n",
+       "\n",
+       "            InvoiceDate  Price  Customer ID         Country  \n",
+       "263 2009-12-01 10:52:00   0.00          nan  United Kingdom  \n",
+       "283 2009-12-01 10:52:00   0.00          nan  United Kingdom  \n",
+       "284 2009-12-01 10:53:00   0.00          nan  United Kingdom  \n",
+       "470 2009-12-01 11:44:00   0.00          nan  United Kingdom  \n",
+       "577 2009-12-01 11:49:00   0.55          nan  United Kingdom  "
+      ]
+     },
+     "execution_count": 86,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "missing_ids = df[df['Customer ID'].isnull()]\n",
+    "missing_ids.head(5)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 87,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "     Variables  missing_count  missing_perc\n",
+      "0      Invoice              0          0.00\n",
+      "1    StockCode              0          0.00\n",
+      "2  Description           2928          0.03\n",
+      "3     Quantity              0          0.00\n",
+      "4  InvoiceDate              0          0.00\n",
+      "5        Price              0          0.00\n",
+      "6  Customer ID         107927          1.00\n",
+      "7      Country              0          0.00\n"
+     ]
+    }
+   ],
+   "source": [
+    "missing_ids_na = missing_ids.isnull().sum().reset_index()\n",
+    "missing_ids_na.columns=['Variables','missing_count']\n",
+    "#missing_data['Missing_perc']\n",
+    "missing_ids_na['missing_perc']=missing_ids_na.missing_count/missing_ids.shape[0]\n",
+    "print(missing_ids_na)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<b>Observation:</b> All empty description are part of rows with empty customer id's (all 2928 transactions with empty descriptions fall withing the rows with the empty customer id's) \n",
+    "<br></br>\n",
+    "<b> Decision: </b> Remove all the rows with empty `customer ID` from dataframe (-21% of total transactions) since these rows cannot be used in the analysis"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 88,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "new_df = df.dropna()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Invoice numbers exploration\n",
+    "\n",
+    "* checking if all invoice numbers consists of numeric values or if we see any characters; the column is initially an object which might be because some characters are present in invoice numbers)\n",
+    "* if characters exists, which ones are included (usually indicate a type of transaction)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 95,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Invoice</th>\n",
+       "      <th>StockCode</th>\n",
+       "      <th>Description</th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>InvoiceDate</th>\n",
+       "      <th>Price</th>\n",
+       "      <th>Customer ID</th>\n",
+       "      <th>Country</th>\n",
+       "      <th>invoice_character_flag</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>178</th>\n",
+       "      <td>C489449</td>\n",
+       "      <td>22087</td>\n",
+       "      <td>PAPER BUNTING WHITE LACE</td>\n",
+       "      <td>-12</td>\n",
+       "      <td>2009-12-01 10:33:00</td>\n",
+       "      <td>2.95</td>\n",
+       "      <td>16,321.00</td>\n",
+       "      <td>Australia</td>\n",
+       "      <td>True</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>179</th>\n",
+       "      <td>C489449</td>\n",
+       "      <td>85206A</td>\n",
+       "      <td>CREAM FELT EASTER EGG BASKET</td>\n",
+       "      <td>-6</td>\n",
+       "      <td>2009-12-01 10:33:00</td>\n",
+       "      <td>1.65</td>\n",
+       "      <td>16,321.00</td>\n",
+       "      <td>Australia</td>\n",
+       "      <td>True</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>180</th>\n",
+       "      <td>C489449</td>\n",
+       "      <td>21895</td>\n",
+       "      <td>POTTING SHED SOW 'N' GROW SET</td>\n",
+       "      <td>-4</td>\n",
+       "      <td>2009-12-01 10:33:00</td>\n",
+       "      <td>4.25</td>\n",
+       "      <td>16,321.00</td>\n",
+       "      <td>Australia</td>\n",
+       "      <td>True</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>181</th>\n",
+       "      <td>C489449</td>\n",
+       "      <td>21896</td>\n",
+       "      <td>POTTING SHED TWINE</td>\n",
+       "      <td>-6</td>\n",
+       "      <td>2009-12-01 10:33:00</td>\n",
+       "      <td>2.10</td>\n",
+       "      <td>16,321.00</td>\n",
+       "      <td>Australia</td>\n",
+       "      <td>True</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>182</th>\n",
+       "      <td>C489449</td>\n",
+       "      <td>22083</td>\n",
+       "      <td>PAPER CHAIN KIT RETRO SPOT</td>\n",
+       "      <td>-12</td>\n",
+       "      <td>2009-12-01 10:33:00</td>\n",
+       "      <td>2.95</td>\n",
+       "      <td>16,321.00</td>\n",
+       "      <td>Australia</td>\n",
+       "      <td>True</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "     Invoice StockCode                    Description  Quantity  \\\n",
+       "178  C489449     22087       PAPER BUNTING WHITE LACE       -12   \n",
+       "179  C489449    85206A   CREAM FELT EASTER EGG BASKET        -6   \n",
+       "180  C489449     21895  POTTING SHED SOW 'N' GROW SET        -4   \n",
+       "181  C489449     21896             POTTING SHED TWINE        -6   \n",
+       "182  C489449     22083     PAPER CHAIN KIT RETRO SPOT       -12   \n",
+       "\n",
+       "            InvoiceDate  Price  Customer ID    Country invoice_character_flag  \n",
+       "178 2009-12-01 10:33:00   2.95    16,321.00  Australia                   True  \n",
+       "179 2009-12-01 10:33:00   1.65    16,321.00  Australia                   True  \n",
+       "180 2009-12-01 10:33:00   4.25    16,321.00  Australia                   True  \n",
+       "181 2009-12-01 10:33:00   2.10    16,321.00  Australia                   True  \n",
+       "182 2009-12-01 10:33:00   2.95    16,321.00  Australia                   True  "
+      ]
+     },
+     "execution_count": 95,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "new_df['invoice_character_flag'] = new_df['Invoice'].str.contains('[A-Z]')\n",
+    "\n",
+    "#exploring the first few rows\n",
+    "new_df[new_df['invoice_character_flag'] == True].head(5)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 123,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "178    C\n",
+       "Name: invoice_letters, dtype: object"
+      ]
+     },
+     "execution_count": 123,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#which letters re included? \n",
+    "new_df['invoice_letters'] = new_df['Invoice'].str.extract(r'([A-Z])')\n",
+    "new_df['invoice_letters'].dropna().drop_duplicates()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<b>Observation:</b> We see invoice numbers starting with the letter 'C', possible cancelations.\n",
+    "\n",
+    "<b> Next Steps: </b>\n",
+    "* We check if we see any invoices by removing the letter\n",
+    "* We check if we see quantity larger than zero for invoices that start with 'C'. If  the assumption for cancellation invoice type stands, all these rows should have negative value for `Quantity`. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 97,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Invoice</th>\n",
+       "      <th>StockCode</th>\n",
+       "      <th>Description</th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>InvoiceDate</th>\n",
+       "      <th>Price</th>\n",
+       "      <th>Customer ID</th>\n",
+       "      <th>Country</th>\n",
+       "      <th>invoice_character_flag</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "Empty DataFrame\n",
+       "Columns: [Invoice, StockCode, Description, Quantity, InvoiceDate, Price, Customer ID, Country, invoice_character_flag]\n",
+       "Index: []"
+      ]
+     },
+     "execution_count": 97,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "new_df[new_df['Invoice'] == '489449']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 126,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>Price</th>\n",
+       "      <th>Customer ID</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>9,839.00</td>\n",
+       "      <td>9,839.00</td>\n",
+       "      <td>9,839.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>-21.55</td>\n",
+       "      <td>28.47</td>\n",
+       "      <td>15,035.01</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>212.08</td>\n",
+       "      <td>405.04</td>\n",
+       "      <td>1,690.63</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>-9,360.00</td>\n",
+       "      <td>0.01</td>\n",
+       "      <td>12,346.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>-6.00</td>\n",
+       "      <td>1.62</td>\n",
+       "      <td>13,576.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>-2.00</td>\n",
+       "      <td>2.95</td>\n",
+       "      <td>14,911.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>-1.00</td>\n",
+       "      <td>6.75</td>\n",
+       "      <td>16,454.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>-1.00</td>\n",
+       "      <td>25,111.09</td>\n",
+       "      <td>18,287.00</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       Quantity     Price  Customer ID\n",
+       "count  9,839.00  9,839.00     9,839.00\n",
+       "mean     -21.55     28.47    15,035.01\n",
+       "std      212.08    405.04     1,690.63\n",
+       "min   -9,360.00      0.01    12,346.00\n",
+       "25%       -6.00      1.62    13,576.00\n",
+       "50%       -2.00      2.95    14,911.00\n",
+       "75%       -1.00      6.75    16,454.00\n",
+       "max       -1.00 25,111.09    18,287.00"
+      ]
+     },
+     "execution_count": 126,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "cancellations = new_df[new_df['invoice_letters'] == 'C']\n",
+    "cancellations.describe()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<b>Observations and Decision:</b>\n",
+    "* removing the letter from the invoice number does not give any records.\n",
+    "* maximum quantity is `-1`, hence all 'C' invoices will result in negative values for total spending (no need to remove these from sample)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Exploring records by country"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 132,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Country\n",
+       "United Kingdom          379423\n",
+       "EIRE                      8710\n",
+       "Germany                   8129\n",
+       "France                    5710\n",
+       "Netherlands               2769\n",
+       "Spain                     1278\n",
+       "Switzerland               1187\n",
+       "Belgium                   1054\n",
+       "Portugal                  1024\n",
+       "Channel Islands            906\n",
+       "Sweden                     883\n",
+       "Italy                      731\n",
+       "Australia                  654\n",
+       "Cyprus                     554\n",
+       "Austria                    537\n",
+       "Greece                     517\n",
+       "Denmark                    428\n",
+       "Norway                     369\n",
+       "Finland                    354\n",
+       "United Arab Emirates       318\n",
+       "Unspecified                280\n",
+       "USA                        244\n",
+       "Japan                      224\n",
+       "Poland                     194\n",
+       "Malta                      172\n",
+       "Lithuania                  154\n",
+       "Singapore                  117\n",
+       "Canada                      77\n",
+       "Thailand                    76\n",
+       "Israel                      74\n",
+       "Iceland                     71\n",
+       "RSA                         65\n",
+       "Korea                       63\n",
+       "Brazil                      62\n",
+       "West Indies                 54\n",
+       "Bahrain                     42\n",
+       "Nigeria                     30\n",
+       "Name: Customer ID, dtype: int64"
+      ]
+     },
+     "execution_count": 132,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "new_df.groupby('Country')['Customer ID'].count().sort_values(ascending=False)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<b> Observation:</b> UK customers are the majority in our sample (90% of usable for analysis transactions). \n",
+    "\n",
+    "<br></br>\n",
+    "<b> Decision: </b> include UK transactions only for this analysis, to get a less complex group. Behaviour across nations can be influenced by different campaigns, discounts, shipping fees etc. Possible differences in currency are also avoided."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 140,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>Price</th>\n",
+       "      <th>Customer ID</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>379,423.00</td>\n",
+       "      <td>379,423.00</td>\n",
+       "      <td>379,423.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>11.45</td>\n",
+       "      <td>3.65</td>\n",
+       "      <td>15,559.94</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>68.94</td>\n",
+       "      <td>68.74</td>\n",
+       "      <td>1,593.74</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>-9,360.00</td>\n",
+       "      <td>0.00</td>\n",
+       "      <td>12,346.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>2.00</td>\n",
+       "      <td>1.25</td>\n",
+       "      <td>14,210.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>4.00</td>\n",
+       "      <td>1.95</td>\n",
+       "      <td>15,581.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>12.00</td>\n",
+       "      <td>3.75</td>\n",
+       "      <td>16,938.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>10,000.00</td>\n",
+       "      <td>25,111.09</td>\n",
+       "      <td>18,287.00</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        Quantity      Price  Customer ID\n",
+       "count 379,423.00 379,423.00   379,423.00\n",
+       "mean       11.45       3.65    15,559.94\n",
+       "std        68.94      68.74     1,593.74\n",
+       "min    -9,360.00       0.00    12,346.00\n",
+       "25%         2.00       1.25    14,210.00\n",
+       "50%         4.00       1.95    15,581.00\n",
+       "75%        12.00       3.75    16,938.00\n",
+       "max    10,000.00  25,111.09    18,287.00"
+      ]
+     },
+     "execution_count": 140,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#check remaining dataset for zerp price or zero quantity\n",
+    "main_df = new_df[new_df['Country'] == 'United Kingdom'] \n",
+    "main_df.describe()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Checking for zero quantity in non-cancellation records"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 141,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>Price</th>\n",
+       "      <th>Customer ID</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>370,951.00</td>\n",
+       "      <td>370,951.00</td>\n",
+       "      <td>370,951.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>11.99</td>\n",
+       "      <td>3.15</td>\n",
+       "      <td>15,565.41</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>67.39</td>\n",
+       "      <td>30.55</td>\n",
+       "      <td>1,593.19</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>1.00</td>\n",
+       "      <td>0.00</td>\n",
+       "      <td>12,346.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>2.00</td>\n",
+       "      <td>1.25</td>\n",
+       "      <td>14,215.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>4.00</td>\n",
+       "      <td>1.95</td>\n",
+       "      <td>15,601.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>12.00</td>\n",
+       "      <td>3.75</td>\n",
+       "      <td>16,940.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>10,000.00</td>\n",
+       "      <td>10,953.50</td>\n",
+       "      <td>18,287.00</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "        Quantity      Price  Customer ID\n",
+       "count 370,951.00 370,951.00   370,951.00\n",
+       "mean       11.99       3.15    15,565.41\n",
+       "std        67.39      30.55     1,593.19\n",
+       "min         1.00       0.00    12,346.00\n",
+       "25%         2.00       1.25    14,215.00\n",
+       "50%         4.00       1.95    15,601.00\n",
+       "75%        12.00       3.75    16,940.00\n",
+       "max    10,000.00  10,953.50    18,287.00"
+      ]
+     },
+     "execution_count": 141,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "#check remaining sample for zero or less values in quantity\n",
+    "main_df[ (main_df['invoice_letters'] != 'C')].describe()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<b>Observation:</b> only the rows with `Invoice` starting with 'C' have negative quantity. which eventually will be removed from total sum calculated for each customer"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### To summarize:\n",
+    "\n",
+    "* Only United Kingdom transactions are included in the analysis.\n",
+    "* Filtered out all transactions with missing customer id."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Preparing the final dataset for analysis"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Constructing new variables:\n",
+    "* <b>monetary_value: </b>  total purchase amount \n",
+    "* <b>T: </b>  time from first to last purchase\n",
+    "* <b>frequency: </b>  number of purchases\n",
+    "* <b>recency: </b> days between snapshot date (a future date selected) and last purchase of user"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 149,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# adding column to original dataframe\n",
+    "main_df['new_customer_id'] = main_df['Customer ID'].astype(int).astype(str)\n",
+    "main_df['total_price'] = round(main_df['Quantity'] * main_df['Price'],2)\n",
+    "main_df['year_week'] = main_df['InvoiceDate'].dt.strftime('%Y') + '_' + main_df['InvoiceDate'].dt.strftime('%U')\n",
+    "\n",
+    "# snapshot date - selecting day after the max available date in the dataset\n",
+    "snapshot_date = main_df['InvoiceDate'].max() + dt.timedelta(days=1) \n",
+    "#print(snapshot_date)\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 148,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>new_customer_id</th>\n",
+       "      <th>recency</th>\n",
+       "      <th>frequency</th>\n",
+       "      <th>monetary_value</th>\n",
+       "      <th>T</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>12346</td>\n",
+       "      <td>67</td>\n",
+       "      <td>46</td>\n",
+       "      <td>-64.68</td>\n",
+       "      <td>294</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>12608</td>\n",
+       "      <td>40</td>\n",
+       "      <td>16</td>\n",
+       "      <td>415.79</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>12745</td>\n",
+       "      <td>122</td>\n",
+       "      <td>22</td>\n",
+       "      <td>723.85</td>\n",
+       "      <td>87</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>12746</td>\n",
+       "      <td>163</td>\n",
+       "      <td>20</td>\n",
+       "      <td>230.85</td>\n",
+       "      <td>203</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>12747</td>\n",
+       "      <td>5</td>\n",
+       "      <td>162</td>\n",
+       "      <td>4,968.58</td>\n",
+       "      <td>363</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "  new_customer_id  recency  frequency  monetary_value    T\n",
+       "0           12346       67         46          -64.68  294\n",
+       "1           12608       40         16          415.79    0\n",
+       "2           12745      122         22          723.85   87\n",
+       "3           12746      163         20          230.85  203\n",
+       "4           12747        5        162        4,968.58  363"
+      ]
+     },
+     "execution_count": 148,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Create aggregated data per customer\n",
+    "final_df = (main_df\n",
+    "           .groupby(['new_customer_id'])\n",
+    "           .agg({'InvoiceDate': [np.min,np.max,lambda x: (snapshot_date - x.max()).days],\n",
+    "                'Invoice': 'count',\n",
+    "                'total_price': 'sum'})\n",
+    "          )\n",
+    "\n",
+    "#flatten multiple indexes dataframe\n",
+    "final_df.columns = final_df.columns.map('_'.join)\n",
+    "final_df = final_df.reset_index()\n",
+    "\n",
+    "# rename columns \n",
+    "final_df.rename(columns={'InvoiceDate_amax' : 'max_date',\n",
+    "                        'InvoiceDate_amin' : 'min_date',\n",
+    "                        'InvoiceDate_<lambda_0>': 'recency',\n",
+    "                         'Invoice_count': 'frequency',\n",
+    "                         'total_price_sum': 'monetary_value'}, inplace=True)\n",
+    "\n",
+    "final_df['T'] = (final_df['max_date'] - final_df['min_date']).dt.days \n",
+    "final_df.drop(['min_date', 'max_date'], axis=1, inplace=True)\n",
+    "final_df.head(5)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 150,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>recency</th>\n",
+       "      <th>frequency</th>\n",
+       "      <th>monetary_value</th>\n",
+       "      <th>T</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>4,035.00</td>\n",
+       "      <td>4,035.00</td>\n",
+       "      <td>4,035.00</td>\n",
+       "      <td>4,035.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>91.38</td>\n",
+       "      <td>94.03</td>\n",
+       "      <td>1,744.37</td>\n",
+       "      <td>137.92</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>98.34</td>\n",
+       "      <td>185.61</td>\n",
+       "      <td>7,103.87</td>\n",
+       "      <td>134.46</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>1.00</td>\n",
+       "      <td>1.00</td>\n",
+       "      <td>-25,111.09</td>\n",
+       "      <td>0.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>17.00</td>\n",
+       "      <td>18.00</td>\n",
+       "      <td>277.88</td>\n",
+       "      <td>0.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>52.00</td>\n",
+       "      <td>43.00</td>\n",
+       "      <td>636.25</td>\n",
+       "      <td>112.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>138.00</td>\n",
+       "      <td>103.00</td>\n",
+       "      <td>1,573.56</td>\n",
+       "      <td>263.00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>374.00</td>\n",
+       "      <td>5,114.00</td>\n",
+       "      <td>341,776.73</td>\n",
+       "      <td>373.00</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "       recency  frequency  monetary_value        T\n",
+       "count 4,035.00   4,035.00        4,035.00 4,035.00\n",
+       "mean     91.38      94.03        1,744.37   137.92\n",
+       "std      98.34     185.61        7,103.87   134.46\n",
+       "min       1.00       1.00      -25,111.09     0.00\n",
+       "25%      17.00      18.00          277.88     0.00\n",
+       "50%      52.00      43.00          636.25   112.00\n",
+       "75%     138.00     103.00        1,573.56   263.00\n",
+       "max     374.00   5,114.00      341,776.73   373.00"
+      ]
+     },
+     "execution_count": 150,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "final_df.describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#distribution of number of transactions per customer per day (to see if frequency should count invoices or if we should count unique date instead)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#boxplots and distributions for graphical representations"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.5"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
